@@ -1,0 +1,9 @@
+.venv/
+venv/
+__pycache__/
+*.pyc
+.env
+.vercel/
+.ipynb_checkpoints/
+Proyecto_Diabetes.ipynb
+diabetes_prediction_dataset.csv
