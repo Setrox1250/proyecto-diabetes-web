@@ -10,18 +10,18 @@ API académica de clasificación de perfiles asociados a diabetes, construida co
 ## Descripción
 
 El modelo fue entrenado con el dataset *Diabetes Prediction Dataset* de Kaggle.
-Utiliza un pipeline `SMOTENC → StandardScaler → RandomForestClassifier` con un umbral de decisión calibrado mediante validación interna (recall objetivo ≥ 90 %).
+Utiliza un pipeline `SMOTENC → StandardScaler → RandomForestClassifier` con un umbral de decisión estándar de 0.5 establecido como criterio del proyecto.
 
 Métricas en test:
 
 | Métrica | Valor |
 |---------|-------|
-| Accuracy | 88.5 % |
-| Recall | 88.9 % |
-| Precision | 42.6 % |
-| F1-score | 57.6 % |
+| Accuracy | 95.48 % |
+| Recall | 75.00 % |
+| Precision | 74.04 % |
+| F1-score | 74.52 % |
 | ROC-AUC | 0.9633 |
-| Umbral | 0.170 |
+| Umbral | 0.50 |
 
 ---
 
@@ -122,7 +122,7 @@ Respuesta esperada:
   "classification": "Perfil clasificado como positivo",
   "probability": 0.82,
   "probability_percentage": 82.0,
-  "threshold": 0.17,
+  "threshold": 0.5,
   "model_version": "1.0.0",
   "disclaimer": "Resultado académico. No constituye un diagnóstico médico."
 }
