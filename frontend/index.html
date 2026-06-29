@@ -68,199 +68,316 @@
     </div>
 
     <!-- ── Form ───────────────────────────────────────────────────────────── -->
-    <main>
-      <div class="main-card">
-        <form id="prediction-form" novalidate aria-label="Formulario de evaluación del perfil">
+    <main class="dashboard-grid">
+      <!-- Columna Izquierda: Formulario e Historial -->
+      <div class="dashboard-left">
+        <div class="main-card">
+          <form id="prediction-form" novalidate aria-label="Formulario de evaluación del perfil">
 
-          <!-- Datos demográficos -->
-          <fieldset>
-            <legend>Datos demográficos</legend>
-            <div class="form-grid">
+            <!-- Datos demográficos -->
+            <fieldset>
+              <legend>Datos demográficos</legend>
+              <div class="form-grid">
 
-              <div class="field-group">
-                <label for="gender">Género</label>
-                <select id="gender" name="gender" required aria-required="true">
-                  <option value="">Cargando categorías...</option>
-                </select>
+                <div class="field-group">
+                  <label for="gender">Género</label>
+                  <select id="gender" name="gender" required aria-required="true">
+                    <option value="">Cargando categorías...</option>
+                  </select>
+                </div>
+
+                <div class="field-group">
+                  <label for="age">Edad (años)</label>
+                  <input
+                    type="number" id="age" name="age"
+                    min="0.08" max="80" step="0.1"
+                    placeholder="Ej. 45"
+                    required aria-required="true"
+                  />
+                </div>
+
               </div>
+            </fieldset>
 
-              <div class="field-group">
-                <label for="age">Edad (años)</label>
-                <input
-                  type="number" id="age" name="age"
-                  min="0.08" max="80" step="0.1"
-                  placeholder="Ej. 45"
-                  required aria-required="true"
-                />
+            <!-- Antecedentes -->
+            <fieldset>
+              <legend>Antecedentes de salud</legend>
+              <div class="form-grid">
+
+                <div class="field-group">
+                  <label for="hypertension">Hipertensión</label>
+                  <select id="hypertension" name="hypertension" required aria-required="true">
+                    <option value="">Selecciona...</option>
+                    <option value="0">No</option>
+                    <option value="1">Sí</option>
+                  </select>
+                </div>
+
+                <div class="field-group">
+                  <label for="heart_disease">Enfermedad cardíaca</label>
+                  <select id="heart_disease" name="heart_disease" required aria-required="true">
+                    <option value="">Selecciona...</option>
+                    <option value="0">No</option>
+                    <option value="1">Sí</option>
+                  </select>
+                </div>
+
+                <div class="field-group">
+                  <label for="smoking_history">Historial de tabaquismo</label>
+                  <select id="smoking_history" name="smoking_history" required aria-required="true">
+                    <option value="">Cargando categorías...</option>
+                  </select>
+                </div>
+
               </div>
+            </fieldset>
 
-            </div>
-          </fieldset>
+            <!-- Mediciones -->
+            <fieldset>
+              <legend>Mediciones clínicas del dataset</legend>
+              <div class="form-grid">
 
-          <!-- Antecedentes -->
-          <fieldset>
-            <legend>Antecedentes de salud</legend>
-            <div class="form-grid">
+                <div class="field-group">
+                  <label for="bmi">IMC (kg/m²)</label>
+                  <input
+                    type="number" id="bmi" name="bmi"
+                    min="10" max="100" step="0.01"
+                    placeholder="Ej. 27.5"
+                    required aria-required="true"
+                  />
+                  <span class="field-hint">Relación entre peso y estatura expresada en kg/m².</span>
+                </div>
 
-              <div class="field-group">
-                <label for="hypertension">Hipertensión</label>
-                <select id="hypertension" name="hypertension" required aria-required="true">
-                  <option value="">Selecciona...</option>
-                  <option value="0">No</option>
-                  <option value="1">Sí</option>
-                </select>
+                <div class="field-group">
+                  <label for="HbA1c_level">HbA1c (%)</label>
+                  <input
+                    type="number" id="HbA1c_level" name="HbA1c_level"
+                    min="3" max="10" step="0.1"
+                    placeholder="Ej. 6.2"
+                    required aria-required="true"
+                  />
+                  <span class="field-hint">Valor porcentual registrado en el dataset.</span>
+                </div>
+
+                <div class="field-group">
+                  <label for="blood_glucose_level">Glucosa sanguínea (mg/dL)</label>
+                  <input
+                    type="number" id="blood_glucose_level" name="blood_glucose_level"
+                    min="50" max="400" step="1"
+                    placeholder="Ej. 140"
+                    required aria-required="true"
+                  />
+                  <span class="field-hint">Valor de glucosa registrado para la clasificación.</span>
+                </div>
+
               </div>
+            </fieldset>
 
-              <div class="field-group">
-                <label for="heart_disease">Enfermedad cardíaca</label>
-                <select id="heart_disease" name="heart_disease" required aria-required="true">
-                  <option value="">Selecciona...</option>
-                  <option value="0">No</option>
-                  <option value="1">Sí</option>
-                </select>
-              </div>
-
-              <div class="field-group">
-                <label for="smoking_history">Historial de tabaquismo</label>
-                <select id="smoking_history" name="smoking_history" required aria-required="true">
-                  <option value="">Cargando categorías...</option>
-                </select>
-              </div>
-
+            <!-- Actions -->
+            <div class="form-actions">
+              <button type="submit" id="btn-submit" class="btn btn-primary" aria-busy="false">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                </svg>
+                Evaluar perfil
+              </button>
+              <button type="button" id="btn-example" class="btn btn-ghost">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18M15 3v18M3 9h18M3 15h18"/>
+                </svg>
+                Cargar ejemplo
+              </button>
+              <button type="button" id="btn-clear" class="btn btn-secondary">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+                </svg>
+                Limpiar formulario
+              </button>
             </div>
-          </fieldset>
-
-          <!-- Mediciones -->
-          <fieldset>
-            <legend>Mediciones clínicas del dataset</legend>
-            <div class="form-grid">
-
-              <div class="field-group">
-                <label for="bmi">IMC (kg/m²)</label>
-                <input
-                  type="number" id="bmi" name="bmi"
-                  min="10" max="100" step="0.01"
-                  placeholder="Ej. 27.5"
-                  required aria-required="true"
-                />
-                <span class="field-hint">Relación entre peso y estatura expresada en kg/m².</span>
-              </div>
-
-              <div class="field-group">
-                <label for="HbA1c_level">HbA1c (%)</label>
-                <input
-                  type="number" id="HbA1c_level" name="HbA1c_level"
-                  min="3" max="10" step="0.1"
-                  placeholder="Ej. 6.2"
-                  required aria-required="true"
-                />
-                <span class="field-hint">Valor porcentual registrado en el dataset.</span>
-              </div>
-
-              <div class="field-group">
-                <label for="blood_glucose_level">Glucosa sanguínea (mg/dL)</label>
-                <input
-                  type="number" id="blood_glucose_level" name="blood_glucose_level"
-                  min="50" max="400" step="1"
-                  placeholder="Ej. 140"
-                  required aria-required="true"
-                />
-                <span class="field-hint">Valor de glucosa registrado para la clasificación.</span>
-              </div>
-
-            </div>
-          </fieldset>
-
-          <!-- Actions -->
-          <div class="form-actions">
-            <button type="submit" id="btn-submit" class="btn btn-primary" aria-busy="false">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-              </svg>
-              Evaluar perfil
-            </button>
-            <button type="button" id="btn-example" class="btn btn-ghost">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18M15 3v18M3 9h18M3 15h18"/>
-              </svg>
-              Cargar ejemplo
-            </button>
-            <button type="button" id="btn-clear" class="btn btn-secondary">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
-              </svg>
-              Limpiar formulario
-            </button>
-          </div>
-          <p id="loading-note" class="loading-note" hidden aria-live="polite">
-            Enviando solicitud al modelo. Si el servicio está iniciándose puede tomar algunos segundos...
-          </p>
-        </form>
-      </div>
-
-      <!-- ── Result ─────────────────────────────────────────────────────────── -->
-      <section id="result-section" aria-label="Resultado de la evaluación" aria-live="polite">
-        <div class="result-card">
-          <h2>Resultado del modelo</h2>
-
-          <div id="classification-banner" class="classification-banner">
-            <span class="banner-icon" id="banner-icon" aria-hidden="true"></span>
-            <div>
-              <div class="banner-title" id="banner-title"></div>
-              <div class="banner-desc"  id="banner-desc"></div>
-            </div>
-          </div>
-
-          <!-- Probability bar -->
-          <div class="prob-section">
-            <div class="prob-header">
-              <span class="prob-label">Probabilidad estimada</span>
-              <span class="prob-value" id="prob-value">—</span>
-            </div>
-            <div class="prob-bar-track" aria-hidden="true">
-              <div class="prob-bar-fill" id="prob-bar" style="width:0%"></div>
-              <div class="threshold-marker" id="threshold-marker" style="left:0%"></div>
-            </div>
-            <div class="bar-labels" aria-hidden="true">
-              <span>0 %</span>
-              <span>Umbral: <span id="threshold-label">—</span></span>
-              <span>100 %</span>
-            </div>
-          </div>
-
-          <!-- Meta -->
-          <div class="result-meta">
-            <div class="meta-item">
-              <div class="meta-label">Umbral utilizado</div>
-              <div class="meta-value" id="meta-threshold">—</div>
-            </div>
-            <div class="meta-item">
-              <div class="meta-label">Versión del modelo</div>
-              <div class="meta-value" id="meta-version">—</div>
-            </div>
-            <div class="meta-item">
-              <div class="meta-label">Clasificación</div>
-              <div class="meta-value" id="meta-classification">—</div>
-            </div>
-          </div>
+            <p id="loading-note" class="loading-note" hidden aria-live="polite">
+              Enviando solicitud al modelo. Si el servicio está iniciándose puede tomar algunos segundos...
+            </p>
+          </form>
         </div>
 
-        <!-- Technical JSON -->
-        <details class="technical-section">
-          <summary>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
-            </svg>
-            Ver respuesta técnica
-            <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <polyline points="9 18 15 12 9 6"/>
-            </svg>
-          </summary>
-          <pre id="json-response" aria-label="Respuesta JSON del modelo"></pre>
-        </details>
+        <!-- Historial de Predicciones -->
+        <section id="history-card" class="main-card history-card" style="margin-top: 1.5rem;">
+          <div class="card-header-flex">
+            <h2>Historial de Evaluaciones</h2>
+            <button id="btn-clear-history" class="btn btn-secondary btn-xs" style="display: none;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path>
+              </svg>
+              Borrar historial
+            </button>
+          </div>
+          <div id="history-list" class="history-list" style="margin-top: 1rem;">
+            <p class="history-empty">No hay evaluaciones recientes en esta sesión.</p>
+          </div>
+        </section>
+      </div>
 
-        <p class="disclaimer-footer" id="result-disclaimer"></p>
-      </section>
+      <!-- Columna Derecha: Resultados y Ficha Técnica -->
+      <div class="dashboard-right">
+        <!-- ── Result ─────────────────────────────────────────────────────────── -->
+        <section id="result-section" aria-label="Resultado de la evaluación" aria-live="polite" style="margin-top: 0; margin-bottom: 1.5rem;">
+          <div class="result-card">
+            <h2>Resultado del modelo</h2>
+
+            <div id="classification-banner" class="classification-banner">
+              <span class="banner-icon" id="banner-icon" aria-hidden="true"></span>
+              <div>
+                <div class="banner-title" id="banner-title"></div>
+                <div class="banner-desc"  id="banner-desc"></div>
+              </div>
+            </div>
+
+            <!-- Probability bar -->
+            <div class="prob-section">
+              <div class="prob-header">
+                <span class="prob-label">Probabilidad estimada</span>
+                <span class="prob-value" id="prob-value">—</span>
+              </div>
+              <div class="prob-bar-track" aria-hidden="true">
+                <div class="prob-bar-fill" id="prob-bar" style="width:0%"></div>
+                <div class="threshold-marker" id="threshold-marker" style="left:0%"></div>
+              </div>
+              <div class="bar-labels" aria-hidden="true">
+                <span>0 %</span>
+                <span>Umbral: <span id="threshold-label">—</span></span>
+                <span>100 %</span>
+              </div>
+            </div>
+
+            <!-- Meta -->
+            <div class="result-meta">
+              <div class="meta-item">
+                <div class="meta-label">Umbral utilizado</div>
+                <div class="meta-value" id="meta-threshold">—</div>
+              </div>
+              <div class="meta-item">
+                <div class="meta-label">Versión del modelo</div>
+                <div class="meta-value" id="meta-version">—</div>
+              </div>
+              <div class="meta-item">
+                <div class="meta-label">Clasificación</div>
+                <div class="meta-value" id="meta-classification">—</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Technical JSON -->
+          <details class="technical-section">
+            <summary>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
+              </svg>
+              Ver respuesta técnica
+              <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <polyline points="9 18 15 12 9 6"/>
+              </svg>
+            </summary>
+            <pre id="json-response" aria-label="Respuesta JSON del modelo"></pre>
+          </details>
+
+          <p class="disclaimer-footer" id="result-disclaimer"></p>
+        </section>
+
+        <!-- Ficha Técnica del Modelo -->
+        <section id="model-tech-card" class="main-card model-tech-card" style="margin-top: 0;">
+          <h2>Ficha Técnica y Evaluación del Modelo</h2>
+          
+          <div id="model-tech-loading" class="model-tech-loading">
+            <span class="spinner spinner-dark" aria-hidden="true"></span>
+            Cargando información técnica...
+          </div>
+          
+          <div id="model-tech-content" style="display: none;">
+            <!-- Métricas Globales -->
+            <div class="tech-section-title">Métricas de Evaluación (Test Original)</div>
+            <div class="metrics-grid">
+              <div class="metric-box">
+                <span class="metric-label" title="Proporción de predicciones correctas totales">Accuracy</span>
+                <span class="metric-val" id="tech-accuracy">—</span>
+              </div>
+              <div class="metric-box">
+                <span class="metric-label" title="Proporción de clasificaciones de riesgo que fueron correctas">Precisión</span>
+                <span class="metric-val" id="tech-precision">—</span>
+              </div>
+              <div class="metric-box">
+                <span class="metric-label" title="Proporción de casos reales de riesgo detectados (Sensibilidad)">Sensibilidad</span>
+                <span class="metric-val" id="tech-recall">—</span>
+              </div>
+              <div class="metric-box">
+                <span class="metric-label" title="Métrica balanceada armónica de precisión y sensibilidad">F1-Score</span>
+                <span class="metric-val" id="tech-f1">—</span>
+              </div>
+              <div class="metric-box">
+                <span class="metric-label" title="Proporción de perfiles sanos correctamente identificados">Especificidad</span>
+                <span class="metric-val" id="tech-specificity">—</span>
+              </div>
+              <div class="metric-box">
+                <span class="metric-label" title="Área Bajo la Curva de Características Operativas del Receptor">ROC-AUC</span>
+                <span class="metric-val" id="tech-roc-auc">—</span>
+              </div>
+            </div>
+
+            <!-- Matriz de Confusión -->
+            <div class="tech-section-title" style="margin-top: 1.5rem;">Matriz de Confusión (Datos Reales de Prueba)</div>
+            <div class="confusion-matrix-container">
+              <div class="cm-grid">
+                <div class="cm-header-cell"></div>
+                <div class="cm-header-cell">Predicho Sano</div>
+                <div class="cm-header-cell">Predicho Riesgo</div>
+                
+                <div class="cm-row-label">Real Sano</div>
+                <div class="cm-cell hit" id="cm-tn" title="Verdadero Negativo: Sano clasificado correctamente">
+                  <span class="cm-val">—</span>
+                  <span class="cm-label">Verdadero Negativo (TN)</span>
+                </div>
+                <div class="cm-cell miss-red" id="cm-fp" title="Falso Positivo: Sano clasificado como Riesgo">
+                  <span class="cm-val">—</span>
+                  <span class="cm-label">Falso Positivo (FP)</span>
+                </div>
+                
+                <div class="cm-row-label">Real Riesgo</div>
+                <div class="cm-cell miss-orange" id="cm-fn" title="Falso Negativo: Riesgo clasificado como Sano">
+                  <span class="cm-val">—</span>
+                  <span class="cm-label">Falso Negativo (FN)</span>
+                </div>
+                <div class="cm-cell hit" id="cm-tp" title="Verdadero Positivo: Riesgo clasificado correctamente">
+                  <span class="cm-val">—</span>
+                  <span class="cm-label">Verdadero Positivo (TP)</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Detalles del Bundle y Metadata -->
+            <details class="technical-section" style="margin-top: 1.5rem; margin-bottom: 0;">
+              <summary>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+                Detalles del Entorno y Librerías
+                <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <polyline points="9 18 15 12 9 6"/>
+                </svg>
+              </summary>
+              <div class="metadata-list">
+                <div class="meta-row"><span>Algoritmo:</span> <strong id="meta-alg">—</strong></div>
+                <div class="meta-row"><span>Python:</span> <span id="meta-py">—</span></div>
+                <div class="meta-row"><span>scikit-learn:</span> <span id="meta-sklearn">—</span></div>
+                <div class="meta-row"><span>imbalanced-learn:</span> <span id="meta-imblearn">—</span></div>
+                <div class="meta-row"><span>pandas:</span> <span id="meta-pandas">—</span></div>
+                <div class="meta-row"><span>numpy:</span> <span id="meta-numpy">—</span></div>
+                <div class="meta-row"><span>scipy:</span> <span id="meta-scipy">—</span></div>
+                <div class="meta-row"><span>Criterio Umbral:</span> <span id="meta-umbral-desc" style="font-size: 0.78rem; font-weight: normal; opacity: 0.85; line-height: 1.35; padding: 0.2rem 0;">—</span></div>
+              </div>
+            </details>
+          </div>
+        </section>
+      </div>
     </main>
 
   </div><!-- /page-wrapper -->

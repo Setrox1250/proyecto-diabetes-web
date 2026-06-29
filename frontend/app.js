@@ -165,8 +165,137 @@ async function checkHealth(showRetry = true) {
   }
 }
 
-// ── Load model categories ─────────────────────────────────────────────────────
+// ── Local Storage Key para Historial ──────────────────────────────────────────
+const LOCAL_STORAGE_KEY = "diabetes_predictions_history";
+
+function getHistory() {
+  try {
+    const data = localStorage.getItem(LOCAL_STORAGE_KEY);
+    return data ? JSON.parse(data) : [];
+  } catch (e) {
+    console.error("Error al leer de localStorage:", e);
+    return [];
+  }
+}
+
+function saveToHistory(payload, result) {
+  try {
+    const history = getHistory();
+    const newEntry = {
+      timestamp: new Date().toISOString(),
+      input: payload,
+      prediction: result.prediction,
+      probability: result.probability,
+      probability_percentage: result.probability_percentage,
+      model_version: result.model_version
+    };
+    history.unshift(newEntry);
+    if (history.length > 20) history.pop();
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(history));
+    renderHistory();
+  } catch (e) {
+    console.error("Error al guardar en el historial:", e);
+  }
+}
+
+function renderHistory() {
+  const historyList = document.getElementById("history-list");
+  const btnClearHistory = document.getElementById("btn-clear-history");
+  if (!historyList) return;
+
+  const history = getHistory();
+  if (history.length === 0) {
+    historyList.innerHTML = '<p class="history-empty">No hay evaluaciones recientes en esta sesión.</p>';
+    if (btnClearHistory) btnClearHistory.style.display = "none";
+    return;
+  }
+
+  if (btnClearHistory) btnClearHistory.style.display = "inline-flex";
+
+  historyList.innerHTML = "";
+  history.forEach((item, index) => {
+    const dateStr = new Date(item.timestamp).toLocaleString("es-ES", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit"
+    });
+
+    const isPositive = item.prediction === 1;
+    const label = isPositive ? "Riesgo Positivo" : "Negativo";
+    const badgeClass = isPositive ? "positive" : "negative";
+    const probPct = item.probability_percentage ?? (item.probability * 100).toFixed(2);
+
+    const genderText = GENDER_LABELS[item.input.gender] ?? item.input.gender;
+    const smokingText = SMOKING_LABELS[item.input.smoking_history] ?? item.input.smoking_history;
+    const hypertensionText = item.input.hypertension === 1 ? "Hipertensión" : "Sin HTA";
+    const heartText = item.input.heart_disease === 1 ? "Enf. cardíaca" : "Sin enf. cardíaca";
+
+    const summary = `${genderText}, ${item.input.age} años | IMC: ${item.input.bmi} | HbA1c: ${item.input.HbA1c_level}% | Glucosa: ${item.input.blood_glucose_level} mg/dL | ${hypertensionText}, ${heartText}, ${smokingText}`;
+
+    const itemDiv = document.createElement("div");
+    itemDiv.className = "history-item";
+    itemDiv.innerHTML = `
+      <div class="history-item-header">
+        <span class="history-date">${dateStr}</span>
+        <span class="history-badge ${badgeClass}">${label} (${probPct}%)</span>
+      </div>
+      <div class="history-summary">${escapeText(summary)}</div>
+      <div class="history-actions">
+        <button class="btn-xxs btn-load-history" data-index="${index}">Cargar datos</button>
+      </div>
+    `;
+    historyList.appendChild(itemDiv);
+  });
+
+  document.querySelectorAll(".btn-load-history").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      const idx = parseInt(e.target.getAttribute("data-index"), 10);
+      loadHistoryItem(idx);
+    });
+  });
+}
+
+function loadHistoryItem(index) {
+  const history = getHistory();
+  const item = history[index];
+  if (!item) return;
+
+  const input = item.input;
+  document.getElementById("gender").value = input.gender || "";
+  document.getElementById("age").value = input.age !== undefined ? input.age : "";
+  document.getElementById("hypertension").value = input.hypertension !== undefined ? input.hypertension.toString() : "";
+  document.getElementById("heart_disease").value = input.heart_disease !== undefined ? input.heart_disease.toString() : "";
+  document.getElementById("smoking_history").value = input.smoking_history || "";
+  document.getElementById("bmi").value = input.bmi !== undefined ? input.bmi : "";
+  document.getElementById("HbA1c_level").value = input.HbA1c_level !== undefined ? input.HbA1c_level : "";
+  document.getElementById("blood_glucose_level").value = input.blood_glucose_level !== undefined ? input.blood_glucose_level : "";
+
+  clearValidation();
+  clearError();
+  hideResult();
+
+  const formCard = document.querySelector(".main-card");
+  if (formCard) {
+    formCard.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+}
+
+function clearHistory() {
+  try {
+    localStorage.removeItem(LOCAL_STORAGE_KEY);
+    renderHistory();
+  } catch (e) {
+    console.error("Error al borrar historial:", e);
+  }
+}
+
+// ── Load model categories and technical details ───────────────────────────────
 async function loadModelInfo() {
+  const techLoading = document.getElementById("model-tech-loading");
+  const techContent = document.getElementById("model-tech-content");
+
   try {
     const res = await fetch(`${API_BASE_URL}/api/model-info`, { signal: AbortSignal.timeout(15000) });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -180,9 +309,44 @@ async function loadModelInfo() {
     if (modelCategories.smoking_history) {
       populateSelect(smokingSelect, modelCategories.smoking_history, SMOKING_LABELS);
     }
-  } catch {
+
+    // Rellenar Ficha Técnica
+    const metrics = info.metrics ?? {};
+    const metadata = info.metadata ?? {};
+
+    document.getElementById("tech-accuracy").textContent = metrics.accuracy !== undefined ? `${(metrics.accuracy * 100).toFixed(2)} %` : "—";
+    document.getElementById("tech-precision").textContent = metrics.precision !== undefined ? `${(metrics.precision * 100).toFixed(2)} %` : "—";
+    document.getElementById("tech-recall").textContent = metrics.recall !== undefined ? `${(metrics.recall * 100).toFixed(2)} %` : "—";
+    document.getElementById("tech-f1").textContent = metrics.f1 !== undefined ? `${(metrics.f1 * 100).toFixed(2)} %` : "—";
+    document.getElementById("tech-specificity").textContent = metrics.specificity !== undefined ? `${(metrics.specificity * 100).toFixed(2)} %` : "—";
+    document.getElementById("tech-roc-auc").textContent = metrics.roc_auc !== undefined ? metrics.roc_auc.toFixed(4) : "—";
+
+    // Celdas de la Matriz de Confusión
+    if (metrics.tn !== undefined) document.querySelector("#cm-tn .cm-val").textContent = Number(metrics.tn).toLocaleString("es-ES");
+    if (metrics.fp !== undefined) document.querySelector("#cm-fp .cm-val").textContent = Number(metrics.fp).toLocaleString("es-ES");
+    if (metrics.fn !== undefined) document.querySelector("#cm-fn .cm-val").textContent = Number(metrics.fn).toLocaleString("es-ES");
+    if (metrics.tp !== undefined) document.querySelector("#cm-tp .cm-val").textContent = Number(metrics.tp).toLocaleString("es-ES");
+
+    // Metadatos del entorno
+    document.getElementById("meta-alg").textContent = metadata.model_name ?? "—";
+    document.getElementById("meta-py").textContent = metadata.python_version ?? "—";
+    document.getElementById("meta-sklearn").textContent = metadata.scikit_learn_version ?? "—";
+    document.getElementById("meta-imblearn").textContent = metadata.imbalanced_learn_version ?? "—";
+    document.getElementById("meta-pandas").textContent = metadata.pandas_version ?? "—";
+    document.getElementById("meta-numpy").textContent = metadata.numpy_version ?? "—";
+    document.getElementById("meta-scipy").textContent = metadata.scipy_version ?? "—";
+    document.getElementById("meta-umbral-desc").textContent = metadata.threshold_method ?? "—";
+
+    if (techLoading) techLoading.style.display = "none";
+    if (techContent) techContent.style.display = "block";
+
+  } catch (err) {
+    console.error("Error al cargar la información del modelo:", err);
     genderSelect.innerHTML  = '<option value="">No disponible</option>';
     smokingSelect.innerHTML = '<option value="">No disponible</option>';
+    if (techLoading) {
+      techLoading.innerHTML = '<span style="color: var(--color-error)">⚠ Error al cargar la información técnica.</span>';
+    }
   }
 }
 
@@ -329,6 +493,7 @@ form.addEventListener("submit", async (e) => {
     }
 
     renderResult(data);
+    saveToHistory(payload, data);
   } catch (err) {
     clearTimeout(timeoutId);
     if (err.name === "AbortError") {
@@ -353,7 +518,6 @@ btnClear.addEventListener("click", () => {
   clearValidation();
   clearError();
   hideResult();
-  // Restore dynamic selects placeholder
   genderSelect.value  = "";
   smokingSelect.value = "";
 });
@@ -372,13 +536,12 @@ btnExample.addEventListener("click", () => {
   document.getElementById("HbA1c_level").value          = "6.8";
   document.getElementById("blood_glucose_level").value  = "190";
 
-  // Gender: pick first available category
-  const genderKeys = Object.keys(modelCategories.gender ?? {});
-  if (genderKeys.length > 0) genderSelect.value = genderKeys[0];
-
-  // Smoking: pick first available category
-  const smokingKeys = Object.keys(modelCategories.smoking_history ?? {});
-  if (smokingKeys.length > 0) smokingSelect.value = smokingKeys[0];
+  if (modelCategories.gender) {
+    genderSelect.value = "Female";
+  }
+  if (modelCategories.smoking_history) {
+    smokingSelect.value = "never";
+  }
 });
 
 // ── Retry button ──────────────────────────────────────────────────────────────
@@ -387,8 +550,15 @@ btnRetry.addEventListener("click", async () => {
   if (apiAvailable) await loadModelInfo();
 });
 
+// ── Clear History button listener ─────────────────────────────────────────────
+const btnClearHistory = document.getElementById("btn-clear-history");
+if (btnClearHistory) {
+  btnClearHistory.addEventListener("click", clearHistory);
+}
+
 // ── Init ──────────────────────────────────────────────────────────────────────
 (async () => {
+  renderHistory();
   await checkHealth(true);
   await loadModelInfo();
 })();
