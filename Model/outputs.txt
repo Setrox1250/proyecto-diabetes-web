@@ -1,0 +1,247 @@
+--- Cell 0 ---
+Requirement already satisfied: xgboost in /usr/local/lib/python3.12/dist-packages (3.2.0)
+Requirement already satisfied: numpy in /usr/local/lib/python3.12/dist-packages (from xgboost) (2.0.2)
+Requirement already satisfied: nvidia-nccl-cu12 in /usr/local/lib/python3.12/dist-packages (from xgboost) (2.30.7)
+Requirement already satisfied: scipy in /usr/local/lib/python3.12/dist-packages (from xgboost) (1.16.3)
+Drive already mounted at /content/drive; to attempt to forcibly remount, call drive.mount("/content/drive", force_remount=True).
+Primeros registros del dataset:
+   gender   age  hypertension  heart_disease smoking_history    bmi  \
+0  Female  80.0             0              1           never  25.19   
+1  Female  54.0             0              0         No Info  27.32   
+2    Male  28.0             0              0           never  27.32   
+3  Female  36.0             0              0         current  23.45   
+4    Male  76.0             1              1         current  20.14   
+
+   HbA1c_level  blood_glucose_level  diabetes  
+0          6.6                  140         0  
+1          6.6                   80         0  
+2          5.7                  158         0  
+3          5.0                  155         0  
+4          4.8                  155         0  
+
+Información general de las columnas:
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 100000 entries, 0 to 99999
+Data columns (total 9 columns):
+ #   Column               Non-Null Count   Dtype  
+---  ------               --------------   -----  
+ 0   gender               100000 non-null  object 
+ 1   age                  100000 non-null  float64
+ 2   hypertension         100000 non-null  int64  
+ 3   heart_disease        100000 non-null  int64  
+ 4   smoking_history      100000 non-null  object 
+ 5   bmi                  100000 non-null  float64
+ 6   HbA1c_level          100000 non-null  float64
+ 7   blood_glucose_level  100000 non-null  int64  
+ 8   diabetes             100000 non-null  int64  
+dtypes: float64(3), int64(4), object(2)
+memory usage: 6.9+ MB
+
+--- Cell 1 ---
+Datos duplicados: 3854
+Datos nulos:
+gender                 0
+age                    0
+hypertension           0
+heart_disease          0
+smoking_history        0
+bmi                    0
+HbA1c_level            0
+blood_glucose_level    0
+diabetes               0
+dtype: int64
+
+Tamaño del dataset después de eliminar duplicados: (96146, 9)
+
+--- Cell 2 ---
+Codificación de gender:
+{'Female': np.int64(0), 'Male': np.int64(1), 'Other': np.int64(2)}
+
+Codificación de smoking_history:
+{'No Info': np.int64(0), 'current': np.int64(1), 'ever': np.int64(2), 'former': np.int64(3), 'never': np.int64(4), 'not current': np.int64(5)}
+
+--- Cell 4 ---
+Importancia exploratoria de características:
+HbA1c_level            0.3959
+blood_glucose_level    0.3188
+bmi                    0.1238
+age                    0.1026
+smoking_history        0.0277
+hypertension           0.0156
+heart_disease          0.0093
+gender                 0.0062
+dtype: float64
+
+Esta estimación permite observar patrones preliminares del dataset.
+La importancia de una característica no demuestra causalidad clínica ni reemplaza una validación externa.
+
+<Figure size 1000x500 with 1 Axes>
+--- Cell 6 ---
+<Figure size 700x500 with 1 Axes>
+Cantidad de muestras por clase:
+diabetes
+0    87664
+1     8482
+Name: count, dtype: int64
+
+Desbalance: 10.3x más sanos que diabéticos
+
+--- Cell 8 ---
+<Figure size 1000x800 with 2 Axes>
+--- Cell 11 ---
+  age: 0 posibles outliers identificados → rango [-28.50, 111.50]
+  bmi: 5354 posibles outliers identificados → rango [13.71, 39.55]
+  HbA1c_level: 1312 posibles outliers identificados → rango [2.70, 8.30]
+  blood_glucose_level: 2031 posibles outliers identificados → rango [11.50, 247.50]
+
+(El dataset original no se modificó)
+
+--- Cell 12 ---
+Requirement already satisfied: imbalanced-learn in /usr/local/lib/python3.12/dist-packages (0.14.2)
+Requirement already satisfied: numpy<3,>=1.25.2 in /usr/local/lib/python3.12/dist-packages (from imbalanced-learn) (2.0.2)
+Requirement already satisfied: scipy<2,>=1.11.4 in /usr/local/lib/python3.12/dist-packages (from imbalanced-learn) (1.16.3)
+Requirement already satisfied: scikit-learn<2,>=1.4.2 in /usr/local/lib/python3.12/dist-packages (from imbalanced-learn) (1.6.1)
+Requirement already satisfied: sklearn-compat<0.2,>=0.1.6 in /usr/local/lib/python3.12/dist-packages (from imbalanced-learn) (0.1.6)
+Requirement already satisfied: joblib<2,>=1.2.0 in /usr/local/lib/python3.12/dist-packages (from imbalanced-learn) (1.5.3)
+Requirement already satisfied: threadpoolctl<4,>=2.0.0 in /usr/local/lib/python3.12/dist-packages (from imbalanced-learn) (3.6.0)
+Nueva distribución de clases en entrenamiento después de SMOTENC:
+diabetes
+0    70130
+1    70130
+Name: count, dtype: int64
+
+--- Cell 13 ---
+<Figure size 700x500 with 1 Axes>
+--- Cell 15 ---
+Tamaño del conjunto de entrenamiento: (140260, 8)
+Distribución en entrenamiento: Counter({0: 70130, 1: 70130})
+
+<Figure size 600x400 with 1 Axes>
+--- Cell 16 ---
+Tamaño del conjunto de prueba: (19230, 8)
+Distribución en prueba: Counter({0: 17534, 1: 1696})
+
+<Figure size 600x400 with 1 Axes>
+--- Cell 17 ---
+<Figure size 1800x800 with 8 Axes>
+
+── RESUMEN ESTADÍSTICO ──────────────────────────────────────────────────
+
+ANTES de normalizar:
+             age        bmi  HbA1c_level  blood_glucose_level
+count  140260.00  140260.00    140260.00            140260.00
+mean       50.49      29.35         6.15               163.04
+std        21.49       7.21         1.20                56.65
+min         0.08      10.01         3.50                80.00
+25%        36.00      25.83         5.70               130.00
+50%        54.23      27.39         6.19               155.00
+75%        67.13      32.68         6.66               200.00
+max        80.00      95.22         9.00               300.00
+
+DESPUÉS de normalizar:
+             age        bmi  HbA1c_level  blood_glucose_level
+count  140260.00  140260.00    140260.00            140260.00
+mean        0.00      -0.00        -0.00                 0.00
+std         1.00       1.00         1.00                 1.00
+min        -2.35      -2.68        -2.20                -1.47
+25%        -0.67      -0.49        -0.37                -0.58
+50%         0.17      -0.27         0.03                -0.14
+75%         0.77       0.46         0.42                 0.65
+max         1.37       9.14         2.37                 2.42
+
+--- Cell 18 ---
+Validación cruzada configurada:
+  Tipo         : Stratified K-Fold
+  Particiones  : K = 5
+  Shuffle      : activado (random_state=42)
+
+Esta configuración se aplicará durante la fase de entrenamiento (Sección 4).
+
+--- Cell 19 ---
+Reporte de Clasificación:
+              precision    recall  f1-score   support
+
+           0       0.98      0.98      0.98     17534
+           1       0.75      0.75      0.75      1696
+
+    accuracy                           0.96     19230
+   macro avg       0.86      0.86      0.86     19230
+weighted avg       0.96      0.96      0.96     19230
+
+
+--- Cell 20 ---
+<Figure size 700x500 with 2 Axes>
+--- Cell 21 ---
+<Figure size 700x500 with 1 Axes>
+El Área Bajo la Curva (AUC) es: 0.9633
+
+--- Cell 22 ---
+<Figure size 1000x600 with 1 Axes>
+--- Cell 26 ---
+<Figure size 1800x500 with 3 Axes>
+--- Cell 28 ---
+RandomForestClassifier(n_jobs=-1, random_state=42)
+--- Cell 30 ---
+Resultados de Validación Cruzada (promedio ± desviación estándar):
+
+ accuracy: 0.955 ± 0.001
+precision: 0.749 ± 0.006
+   recall: 0.745 ± 0.011
+       f1: 0.747 ± 0.008
+  roc_auc: 0.965 ± 0.003
+
+--- Cell 31 ---
+
+Accuracy preliminar en TEST: 0.956
+
+--- Cell 32 ---
+<Figure size 600x400 with 2 Axes>
+
+Reporte de clasificación (Validación):
+                    precision    recall  f1-score   support
+
+Clase negativa (0)       0.98      0.98      0.98     70130
+Clase positiva (1)       0.75      0.74      0.75      6786
+
+          accuracy                           0.96     76916
+         macro avg       0.86      0.86      0.86     76916
+      weighted avg       0.96      0.96      0.96     76916
+
+
+--- Cell 33 ---
+
+Accuracy en TRAIN (CV): 0.999
+Accuracy en VALID (CV): 0.955
+
+La validación cruzada aplica SMOTENC únicamente dentro de cada
+partición de entrenamiento, evitando que las muestras sintéticas
+influyan en la porción de validación. Las métricas obtenidas permiten
+estimar la estabilidad interna del modelo, mientras que el desempeño
+final debe determinarse con el conjunto de prueba original.
+
+--- Cell 35 ---
+Accuracy final en TEST: 0.956
+
+Distribución total de las predicciones del modelo en el test:
+Counter({np.int64(0): 17537, np.int64(1): 1693})
+
+--- Cell 36 ---
+<Figure size 600x400 with 2 Axes>
+REPORTE DE CLASIFICACIÓN FINAL (CONJUNTO DE TEST):
+                    precision    recall  f1-score   support
+
+Clase negativa (0)       0.98      0.98      0.98     17534
+Clase positiva (1)       0.75      0.75      0.75      1696
+
+          accuracy                           0.96     19230
+         macro avg       0.86      0.86      0.86     19230
+      weighted avg       0.96      0.96      0.96     19230
+
+
+Especificidad: 0.976
+Tasa de falsos negativos: 0.252
+
+--- Cell 37 ---
+<Figure size 700x500 with 1 Axes>
+Área Bajo la Curva ROC (AUC Final): 0.9633
+
